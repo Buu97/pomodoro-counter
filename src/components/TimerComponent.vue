@@ -1,9 +1,12 @@
 <script setup>
-import {addMinutes, format, setHours, setMinutes, setSeconds, subSeconds} from "date-fns";
+import {addMinutes, differenceInMilliseconds, format, setHours, setMinutes, setSeconds, subSeconds} from "date-fns";
 import {computed, ref} from "vue";
+import ProgressSpinnerComponent from "@/components/ProgressSpinnerComponent.vue";
 
 const time = ref(setSeconds(setMinutes(setHours(new Date(), 0), 1), 0));
 const intervalId = ref(null);
+const percentage = ref(100);
+const initialDistance = ref(0);
 const displayedTime = computed(() => {
   return format(time.value, 'mm:ss');
 });
@@ -15,12 +18,16 @@ function addFiveMinutes() {
   time.value = addMinutes(time.value, 5);
 }
 function startTimer() {
+  initialDistance.value = differenceInMilliseconds(new Date(), time.value);
+  percentage.value = 100;
   intervalId.value = setInterval(() => {
     if (time.value.getSeconds() === 0 && time.value.getMinutes() === 0 && time.value.getHours() === 0) {
       pauseTimer();
       return;
     }
     time.value = subSeconds(time.value, 1);
+    const distance = differenceInMilliseconds(time.value, new Date());
+    percentage.value = Math.floor((distance * 100) / initialDistance.value);
   }, 1000);
 }
 
@@ -30,15 +37,18 @@ function pauseTimer() {
   }
 }
 function resetTimer() {
-  pauseTimer();
-  time.value = setSeconds(setMinutes(setHours(new Date(), 0), 1), 0);
+  // pauseTimer();
+  // time.value = setSeconds(setMinutes(setHours(new Date(), 0), 1), 0);
 }
 </script>
 
 <template>
 <main class="container">
-  <div id="timer">
-    {{ displayedTime }}
+  <div class="timer">
+    <ProgressSpinnerComponent :percentage="percentage" :size="200" />
+    <span class="timer-text">
+      {{ displayedTime }}
+    </span>
   </div>
 
   <div class="actions">
@@ -57,9 +67,23 @@ function resetTimer() {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-#timer {
+.actions {
+  display: flex;
+  gap: .5rem;
+}
+
+.timer {
   font-size: 30px;
+  position: relative;
+}
+.timer .timer-text {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
 }
 </style>
