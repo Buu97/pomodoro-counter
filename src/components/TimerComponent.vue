@@ -2,7 +2,13 @@
 import {computed, ref} from "vue";
 import ProgressSpinnerComponent from "@/components/ProgressSpinnerComponent.vue";
 
-const time = ref(120);
+const props = defineProps({
+  startTime: {
+    type: Number,
+    default: 25 * 60
+  }
+});
+const time = ref(props.startTime);
 const intervalId = ref(null);
 const initialDistance = ref(time.value);
 const displayedTime = computed(() => {
@@ -27,13 +33,9 @@ const percentage = computed(() => {
   return (time.value * 100) / initialDistance.value;
 });
 
-function addOneMinute() {
-  time.value = time.value + 60;
-  initialDistance.value += 60;
-}
-function addFiveMinutes() {
-  time.value = time.value + (60 * 5);
-  initialDistance.value += (60 * 5);
+function addMinutes(value) {
+  time.value = time.value + (value * 60);
+  initialDistance.value += (value * 60);
 }
 function startTimer() {
   intervalId.value = setInterval(() => {
@@ -48,6 +50,7 @@ function startTimer() {
 function pauseTimer() {
   if (intervalId.value) {
     clearInterval(intervalId.value);
+    intervalId.value = null;
   }
 }
 function resetTimer() {
@@ -70,8 +73,8 @@ function resetTimer() {
     <button id="reset" @click="resetTimer">Reset</button>
     <button id="start" v-if="!intervalId" @click="startTimer">Start</button>
     <button id="pause" v-if="intervalId" @click="pauseTimer">Pause</button>
-    <button id="add-minute" @click="addOneMinute">+ 1mn</button>
-    <button id="add-5-minute" @click="addFiveMinutes">+ 5mn</button>
+    <button id="add-minute" @click="addMinutes(5)">+ 5mn</button>
+    <button id="add-5-minute" @click="addMinutes(15)">+ 15mn</button>
   </div>
 </main>
 </template>

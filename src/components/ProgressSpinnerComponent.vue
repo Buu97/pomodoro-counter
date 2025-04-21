@@ -31,7 +31,7 @@ const strokeDashoffset = computed(() => (circumference.value * (1 - props.percen
 
 .progress-circle {
   fill: none;
-  stroke: #3f51b5;
+  stroke: var(--color-primary);
   stroke-width: 10;
   stroke-linecap: round;
   transform: rotate(-90deg); /* Start at top */
