@@ -1,33 +1,47 @@
 <script setup>
-import {addMinutes, differenceInMilliseconds, format, setHours, setMinutes, setSeconds, subSeconds} from "date-fns";
 import {computed, ref} from "vue";
 import ProgressSpinnerComponent from "@/components/ProgressSpinnerComponent.vue";
 
-const time = ref(setSeconds(setMinutes(setHours(new Date(), 0), 1), 0));
+const time = ref(120);
 const intervalId = ref(null);
-const percentage = ref(100);
-const initialDistance = ref(0);
+const initialDistance = ref(time.value);
 const displayedTime = computed(() => {
-  return format(time.value, 'mm:ss');
+  const format = (value) => value.toString().replace(/([,.])\d+/, '').padStart(2, '0');
+  if (time.value % 3600 === 0) {
+    return `${format(time.value / 3600)}:00:00`;
+  }
+
+  const hours = time.value >= 3600 ? format(time.value / 3600) : '00';
+  let remainder = time.value % 3600;
+  if (remainder % 60 === 0) {
+    return `${hours}:${format(remainder / 60)}:00`
+  }
+
+  const minutes = remainder >= 60 ? format(remainder / 60) : '00';
+  remainder = remainder % 60;
+  if (remainder > 0) {
+    return `${hours}:${minutes}:${format(remainder)}`;
+  }
+});
+const percentage = computed(() => {
+  return (time.value * 100) / initialDistance.value;
 });
 
 function addOneMinute() {
-  time.value = addMinutes(time.value, 1);
+  time.value = time.value + 60;
+  initialDistance.value += 60;
 }
 function addFiveMinutes() {
-  time.value = addMinutes(time.value, 5);
+  time.value = time.value + (60 * 5);
+  initialDistance.value += (60 * 5);
 }
 function startTimer() {
-  initialDistance.value = differenceInMilliseconds(new Date(), time.value);
-  percentage.value = 100;
   intervalId.value = setInterval(() => {
-    if (time.value.getSeconds() === 0 && time.value.getMinutes() === 0 && time.value.getHours() === 0) {
+    if (time.value === 0) {
       pauseTimer();
       return;
     }
-    time.value = subSeconds(time.value, 1);
-    const distance = differenceInMilliseconds(time.value, new Date());
-    percentage.value = Math.floor((distance * 100) / initialDistance.value);
+    time.value--;
   }, 1000);
 }
 
@@ -37,8 +51,9 @@ function pauseTimer() {
   }
 }
 function resetTimer() {
-  // pauseTimer();
-  // time.value = setSeconds(setMinutes(setHours(new Date(), 0), 1), 0);
+  pauseTimer();
+  time.value = 60;
+  initialDistance.value = time.value;
 }
 </script>
 
