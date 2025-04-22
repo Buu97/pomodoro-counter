@@ -3,14 +3,27 @@
 
 a,
 .green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+    text-decoration: none;
+    color: hsla(160, 100%, 37%, 1);
+    transition: 0.4s;
+    padding: 3px;
+}
+
+#app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
 }
 
 @media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+    a:hover {
+        background-color: hsla(160, 100%, 37%, 0.2);
+    }
 }
